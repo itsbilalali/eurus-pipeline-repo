@@ -1,0 +1,28 @@
+name: Create Merge-to-Main PR based on Labelled PR
+
+on:
+  pull_request:
+    types:
+      - labeled
+
+jobs:
+  cherry_pick_to_main:
+    runs-on: ubuntu-latest
+    name: Cherry pick into main
+    if: ${{ github.event.pull_request.merged == true && startsWith(github.event.label.name, 'release-') }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          
+      - uses: actions/checkout@v3
+      - uses: carloscastrojumo/github-cherry-pick-action@v1.0.1
+        id: cherry-pick
+        with:
+          branch: ${{ github.event.label.name }} 
+
+
+
+
+
