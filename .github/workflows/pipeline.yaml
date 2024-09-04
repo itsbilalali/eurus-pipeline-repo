@@ -1,4 +1,4 @@
-name: Create Merge-to-Main PR based on Labelled PR
+name: Create PR to Release Branch on Label
 
 on:
   pull_request:
@@ -6,24 +6,18 @@ on:
       - labeled
 
 jobs:
-  cherry_pick_to_main:
+  create_pr_to_release_branch:
     runs-on: ubuntu-latest
-    name: Cherry pick into main
-    if: ${{ github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'tested') }}
+    name: Create PR into Branch from Label
+    if: ${{ github.event.pull_request.merged == true && startsWith(github.event.label.name, 'release-') }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          
-      - uses: actions/checkout@v3
-      - uses: carloscastrojumo/github-cherry-pick-action@v1.0.1
-        id: cherry-pick
+
+      - name: Cherry Pick into Release Branch
+        uses: carloscastrojumo/github-cherry-pick-action@v1.0.1
         with:
-          branch: main
-          force: true 
-
-
-
-
-
+          branch: ${{ github.event.label.name }}
+          force: true
